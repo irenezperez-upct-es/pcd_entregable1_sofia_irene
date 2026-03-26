@@ -1,5 +1,3 @@
-
-
 from abc import ABCMeta, abstractmethod
 from enum import Enum
 
@@ -26,7 +24,7 @@ class Nave:
         self.nombre = nombre
         self.catalogo = catalogo
 
-    def usar_respuesto(self, nombre):
+    def usar_repuesto(self, nombre):
         return nombre in self.catalogo
     
     def __str__(self):
@@ -58,7 +56,7 @@ class EstacionEspacial(Nave, UnidadCombate):
         self.localizacion = localizacion
 
     def __str__(self):
-        return f"EstacionEspacial({self.nombre}, {self.localizacion}, Tripulación:{self.tripulacion}, Pasaje:{self.pasaje})"
+        return f"EstacionEspacial({self.nombre}, Ubicación: {self.localizacion}, Tripulación:{self.tripulacion}, Pasaje:{self.pasaje})"
 
 
 #clase Nave estelar
@@ -75,7 +73,7 @@ class NaveEstelar(Nave, UnidadCombate):
         self.tipo_clase = tipo_clase
 
     def __str__(self):
-        return f"NaveEstelar({self.nombre}, Clase:{self.tipo_clase}, Trip:{self.tripulacion})"
+        return f"NaveEstelar({self.nombre}, Clase:{self.tipo_clase}, Tripulación:{self.tripulacion})"
 
 
 #clase Caza estelar
@@ -90,7 +88,7 @@ class CazaEstelar(Nave, UnidadCombate):
         self.dotacion = dotacion
 
     def __str__(self):
-        return f"CazaEstelar({self.nombre}, Dotacion:{self.dotacion})"
+        return f"CazaEstelar({self.nombre}, Dotación:{self.dotacion})"
 
 
 #clase Repuesto
@@ -140,11 +138,11 @@ class Almacen:
         return r and r.obtener_cantidad() >= cantidad
     
     def __str__(self):
-        return f"Almacen({self.nombre}, {self.localizacion})"
+        return f"Almacen({self.nombre}, Ubicación: {self.localizacion})"
 
 
 #clases tipos de usuarios (abstracta)
-class Usuario(mataclass = ABCMeta):
+class Usuario(metaclass = ABCMeta):
     def __init__(self, nombre):
         self.nombre = nombre
     
@@ -197,9 +195,37 @@ class MiImperio:
             if repuesto:
                 repuesto.reducir_stock(cantidad)
                 return repuesto
-        raise LookupError(f"Respuesto {repuesto} no ha sido encontrado") #BUSCAR LLOOKUPERROR
+        raise LookupError(f"Respuesto '{nombre}' no ha sido encontrado") #BUSCAR LOOKUPERROR
     
     def __str__(self):
         return f"MiImperio(Almacenes:{len(self.almacenes)}, Naves:{len(self.naves)})"
 
-    
+#demostración
+def demo():
+    r1 = Repuesto("Motor", "Proveedor1", 20, 700)
+    r2 = Repuesto("Ala", "Proveedor2", 5, 300)
+    print(r1)
+    print(r2)
+
+    a1 = Almacen("Almacen1", "Cumulos_Raimos")
+    a1.anadir_repuesto(r1)
+    a1.anadir_repuesto(r2)
+
+
+    nave = EstacionEspacial("Luna", ["Motor", "Ala"], "Id1", 1111, 50, 2, EUbicacion.ENDOR)
+
+    sistema = MiImperio()
+    sistema.agregar_almacen(a1)
+    sistema.agregar_nave(nave)
+
+    rep1 = sistema.solicitar_repuesto("Motor", 3)
+    rep2 = sistema.solicitar_repuesto("Ala", 2)
+    print(rep1)
+    print(rep2)
+
+    print(nave)
+    print(sistema)
+
+#programa principal
+if __name__ == "__main__":
+    demo()
