@@ -26,7 +26,7 @@ class Nave:
         self.nombre = nombre
         self.catalogo = catalogo
 
-    def usar_respuesto(self, nombre):
+    def usar_repuesto(self, nombre):
         return nombre in self.catalogo
     
     def __str__(self):
@@ -144,7 +144,7 @@ class Almacen:
 
 
 #clases tipos de usuarios (abstracta)
-class Usuario(mataclass = ABCMeta):
+class Usuario(mataclass=ABCMeta):
     def __init__(self, nombre):
         self.nombre = nombre
     
@@ -197,7 +197,7 @@ class MiImperio:
             if repuesto:
                 repuesto.reducir_stock(cantidad)
                 return repuesto
-        raise LookupError(f"Respuesto {repuesto} no ha sido encontrado") #BUSCAR LLOOKUPERROR
+        raise LookupError(f"Respuesto '{repuesto}' no ha sido encontrado") #BUSCAR LLOOKUPERROR
     
     def __str__(self):
         return f"MiImperio(Almacenes:{len(self.almacenes)}, Naves:{len(self.naves)})"
