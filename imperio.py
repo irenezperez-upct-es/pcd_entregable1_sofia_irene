@@ -58,7 +58,7 @@ class EstacionEspacial(Nave, UnidadCombate):
         self.localizacion = localizacion
 
     def __str__(self):
-        return f"EstacionEspacial({self.nombre}, {self.localizacion}, Tripulación:{self.tripulacion}, Pasaje:{self.pasaje})"
+        return f"EstacionEspacial({self.nombre}, Ubicación: {self.localizacion}, Tripulación:{self.tripulacion}, Pasaje:{self.pasaje})"
 
 
 #clase Nave estelar
@@ -75,7 +75,7 @@ class NaveEstelar(Nave, UnidadCombate):
         self.tipo_clase = tipo_clase
 
     def __str__(self):
-        return f"NaveEstelar({self.nombre}, Clase:{self.tipo_clase}, Trip:{self.tripulacion})"
+        return f"NaveEstelar({self.nombre}, Clase:{self.tipo_clase}, Tripulación:{self.tripulacion})"
 
 
 #clase Caza estelar
@@ -90,7 +90,7 @@ class CazaEstelar(Nave, UnidadCombate):
         self.dotacion = dotacion
 
     def __str__(self):
-        return f"CazaEstelar({self.nombre}, Dotacion:{self.dotacion})"
+        return f"CazaEstelar({self.nombre}, Dotación:{self.dotacion})"
 
 
 #clase Repuesto
@@ -140,7 +140,7 @@ class Almacen:
         return r and r.obtener_cantidad() >= cantidad
     
     def __str__(self):
-        return f"Almacen({self.nombre}, {self.localizacion})"
+        return f"Almacen({self.nombre}, Ubicación: {self.localizacion})"
 
 
 #clases tipos de usuarios (abstracta)
@@ -197,9 +197,9 @@ class MiImperio:
             if repuesto:
                 repuesto.reducir_stock(cantidad)
                 return repuesto
-        raise LookupError(f"Respuesto '{repuesto}' no ha sido encontrado") #BUSCAR LLOOKUPERROR
+        raise LookupError(f"Respuesto '{repuesto}' no ha sido encontrado") #BUSCAR LOOKUPERROR
     
     def __str__(self):
         return f"MiImperio(Almacenes:{len(self.almacenes)}, Naves:{len(self.naves)})"
 
-    
+
