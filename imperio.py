@@ -195,36 +195,113 @@ class MiImperio:
             if repuesto:
                 repuesto.reducir_stock(cantidad)
                 return repuesto
-        raise LookupError(f"Respuesto '{nombre}' no ha sido encontrado") #BUSCAR LOOKUPERROR
+        raise LookupError(f"Respuesto '{nombre}' no ha sido encontrado")
     
     def __str__(self):
         return f"MiImperio(Almacenes:{len(self.almacenes)}, Naves:{len(self.naves)})"
 
 #demostración
 def demo():
+    #creación de usuarios
+    comandante = Comandante("Sánchez")
+    operario = Operario("Vader")
+
+    #creación de respuestos
     r1 = Repuesto("Motor", "Proveedor1", 20, 700)
     r2 = Repuesto("Ala", "Proveedor2", 5, 300)
-    print(r1)
-    print(r2)
+    r3 = Repuesto("Escudo", "Proveedor3", 10, 600)
+    r4 = Repuesto("Turbina", "Proveedor4", 2, 2000)
 
+    print(f"\nRepuestos creados:")
+    for rep in [r1, r2, r3, r4]:
+        print(f"{rep}")
+    
+    #creación de almacenes
     a1 = Almacen("Almacen1", "Cumulos_Raimos")
-    a1.anadir_repuesto(r1)
-    a1.anadir_repuesto(r2)
+    operario.anadir_repuesto(a1, r1)
+    operario.anadir_repuesto(a1, r2)
+    operario.anadir_repuesto(a1, r3)
 
+    print(f"\nEstado del almacén '{a1.nombre}' después de añadir repuestos:")
+    for rep in a1.catalogo:
+        print(f"{rep}")
 
-    nave = EstacionEspacial("Luna", ["Motor", "Ala"], "Id1", 1111, 50, 2, EUbicacion.ENDOR)
+    #creación de segundo almacén
+    a2 = Almacen("Almacen2", "Nebulosa_Kaliida")
+    operario.anadir_repuesto(a2, r4)  
+
+    print(f"\nEstado del almacén '{a2.nombre}' después de añadir repuestos:")
+    for rep in a2.catalogo:
+        print(f"{rep}")
+
+    #creación de naves
+    nave1 = EstacionEspacial("Luna", ["Motor", "Ala"], "Id1", 1111, 50, 2, EUbicacion.ENDOR)
+    nave2= NaveEstelar("Pleiades", ["Motor"], "Id2", 2222, 20, 5, EClaseNave.EJECUTOR)
+    nave3 = CazaEstelar("Athena", ["Motor"], "Id3", 3333, 1)
 
     sistema = MiImperio()
     sistema.agregar_almacen(a1)
-    sistema.agregar_nave(nave)
+    sistema.agregar_almacen(a2)
+    sistema.agregar_nave(nave1)
+    sistema.agregar_nave(nave2)
+    sistema.agregar_nave(nave3)
 
-    rep1 = sistema.solicitar_repuesto("Motor", 3)
-    rep2 = sistema.solicitar_repuesto("Ala", 2)
-    print(rep1)
-    print(rep2)
-
-    print(nave)
+    print(f"\n----Estado inicial del sistema:----")
     print(sistema)
+    for nave in sistema.naves:
+        print(f"{nave}")
+
+    
+    #comandante solicita repuestos correctamente
+    print(f"\nComandante solicita 3 Motores y 2 Alas")
+    try:
+        rep1 = comandante.solicitar_repuesto(sistema, "Motor", 3)
+        rep2 = comandante.solicitar_repuesto(sistema, "Ala", 2)
+        print(f"Repuesto solicitado: {rep1}")
+        print(f"Repuesto solicitado: {rep2}")
+    except (StockInsuficienteError, LookupError, ValueError) as e: #para decir que este tipo de excepciones se manejan de la misma forma
+        print(f"Error: {e}")
+
+    
+    #Comandante solicita un repuesto que solo está en el segundo almacén
+    print(f"\nSolicitando un repuesto que solo está disponible en el 2º almacén:")
+    try:
+        rep_turbina = comandante.solicitar_repuesto(sistema, "Turbina", 1)
+        print(f"Repuesto solicitado: {rep_turbina}")
+    except (StockInsuficienteError, LookupError) as e:
+        print(f"Error: {e}")
+
+    #manejamos errores
+    #Pedir mas repuestos de los que hay
+    print(f"\nPidiendo más repuestos de los que hay")
+    try:
+        rep3 = comandante.solicitar_repuesto(sistema, "Ala", 10) 
+        print(f"Repuesto solicitado: {rep3}")
+    except StockInsuficienteError as e:
+        print(f"Error: {e}")
+
+    #Probar un repuesto que no existe
+    print(f"\nProbando un repuesto que no existe")
+    try:
+        rep4 = comandante.solicitar_repuesto(sistema, "Láser", 1)
+        print(f"Repuesto solicitado: {rep4}")
+    except LookupError as e:
+        print(f"Error: {e}")
+
+    #Mostrar estado final del almacén
+    print(f"\nEstado final del almacén 1:")
+    for repuesto in a1.catalogo:
+        print(f"{repuesto}")
+
+    print(f"\nEstado final del almacén 2:")
+    for repuesto in a2.catalogo:
+        print(f"{repuesto}")
+
+    # Mostrar estado final de las naves
+    print(f"\nEstado final de las naves:")
+    for nave in sistema.naves:
+        print(f"{nave}")
+
 
 #programa principal
 if __name__ == "__main__":
