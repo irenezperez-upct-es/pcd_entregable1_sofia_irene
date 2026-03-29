@@ -4,3 +4,6 @@ class StockInsuficienteError(Exception):
 
 class RepuestoNoEncontradoError(Exception):
     pass
+
+class WrongType(Exception):
+    pass
