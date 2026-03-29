@@ -3,7 +3,8 @@ from abc import ABCMeta, abstractmethod
 from enum import Enum
 from excepciones import StockInsuficienteError, RepuestoNoEncontradoError, WrongType
 
-
+# usamos Enum para representar las ubicaciones de las naves y las clases de estas con valores cerrados y controlados
+# Esto evita errores de escritura y garanriza que solo se usen ubicaciones y clases válidas
 class EUbicacion(Enum): #Enum para las ubicaciones de las naves
     ENDOR = 1
     CUMULO_RAIMOS = 2
@@ -15,6 +16,10 @@ class EClaseNave(Enum): #Enum para las clases de las naves estelares
     SOBERANO = 3
 
 #clase padre Nave 
+# Decisión de diseño:
+# La clase nave actúa como clase base para todos los tipos de naves (estaciones espaciales, naves estelares y cazas estelares) 
+# porque comparten atributos comunes como el nombre y el catálogo de repuestos necesarios para su mantenimiento. De esta manera, 
+# se evita la duplicación de código y facilita la extensibilidad del sistema
 class Nave:
     """
     Clase base que representa una nave genérica del sistema.
@@ -71,6 +76,10 @@ class Nave:
     
 
 #clase Unidad de combate
+# Decisión de diseño:
+# Se separa de nave para permitir herencia múltiple
+# Esto refleja que una nave puede tener características físicas (Nave) y militares (UnidadCombate)
+# sin mezclar responsabilidades 
 class UnidadCombate:
     """
     Representa una unidad de combate con un ID de combate único y una clave de acceso.
@@ -291,6 +300,10 @@ class CazaEstelar(Nave, UnidadCombate):
 
 
 #clase Repuesto
+# Decisión de diseño:
+# El atributo __cantidad es privado para proteger el stock
+# Solo puede modificarse mediante métodos controlados que validan errores
+# Esto evita inconsistencias en el inventario
 class Repuesto:
     """
     Representa un repuesto disponible en el sistema, con atributos como el nombre del repuesto, el proveedor, la cantidad disponible y el precio.
@@ -381,6 +394,10 @@ class Repuesto:
 
 
 #clase Almacen
+# Decisión de diseño:
+# El almacén mantiene un catálogo de repuestos
+# Se controla que no haya duplicados para evitar inconsisyencias en el inventario
+# La búsqueda se hace por nombre porque es el identificador natural del repuesto
 class Almacen:
     """
     Representa un almacén del imperio que contiene un catálogo de repuestos disponibles.
@@ -493,6 +510,10 @@ class Operario(Usuario):
         return f"Operario {self.nombre}"
 
 #Clase MiImperio (sistema principal):
+# Decisión de diseño:
+# MiImperio actúa como sistema central qiue coordina almacenes y naves
+# La solicitud de repuestos recorre todos los almacenes en orden, simulando un sistema distribuido donde 
+# cualquier almacén puede satisfacer la demanda
 class MiImperio:
     """
     Clase principal del sistema que representa el imperio y gestiona los almacenes y las naves.
@@ -543,6 +564,10 @@ def pedir_entero(mensaje):
         except ValueError:
             print("Entrada no válida. Por favor, ingrese un número entero.")
 
+# Decisión de diseño:
+# El menú usa códigos imperiales (CMD- y OPR-) para distinguir roles
+# Esto garantiza que cada usuario accede solo a las funciones permitidas por el enunciado 
+# No usamos contraseña para simplificar la autentificación
 def menu():
     """
     Interfaz principal del sistema
@@ -563,19 +588,19 @@ def menu():
     codigo = input("Introduce el código imperial para ingresar al sistema: ")
 
     # Comandante
-    if codigo.startswith("CMD-"):
+    if codigo.startswith("CMD-"): # si el código empieza por CMD- entonces es un comandante
         print("Código de comandante reconocido.")
         nombre = input("Introduzca el nombre del comandante: ")
         comandante = Comandante(nombre)
-        menu_comandante(sistema, comandante)
+        menu_comandante(sistema, comandante) # llamamos al menú de comandante 
     
     # Operario
-    elif codigo.startswith("OPR-"):
+    elif codigo.startswith("OPR-"): # si el código empieza por OPR- entonces es un operario
         print("Código de operario reconocido.")
         nombre = input("Introduzca el nombre del operario: ")
         operario = Operario(nombre)
-        menu_operario(sistema, operario)
-    
+        menu_operario(sistema, operario) # llamamos al menú de operario 
+        
     # Código no reconocido
     else:
         print("Código no reconocido. Acceso denegado.")
