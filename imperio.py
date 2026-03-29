@@ -629,6 +629,7 @@ def menu_comandante(sistema, comandante):
         print("2) Solicitar repuesto")
         print("3) Ver estado de los almacenes")
         print("4) Salir")
+        print("5) Volver a mostrar el menú")
 
 
         opcion = input(f"Elige una opción: ")
@@ -666,7 +667,7 @@ def menu_comandante(sistema, comandante):
 
         # opción no válida: mostrar mensaje de error y volver a mostrar el menú
         else:
-            print("Opción no valida. Por favor, elige una opción del menú")
+            print("Opción no valida. Por favor, pulse 5 para volver a mostrar el menú")
             opcion = input(f"Elige una opción: ")
 
 
@@ -684,13 +685,14 @@ def menu_operario(sistema, operario):
     - operario (Operario): instancia de Operario que representa al usuario operario que está utilizando el sistema
     """
     while True: # bucle para mostrar el menú de forma continua hasta que el usuario decida salir
-        print(f"\n")
-        print(f"\n---MENÚ DEL OPERARIO---")
+        print("\n")
+        print("\n---MENÚ DEL OPERARIO---")
         print()
-        print(f"1) Añadir repuesto al almacén")
-        print(f"2) Ver estado de los almacenes")
-        print(f"3) Crear nuevo almacén")
-        print(f"4) Salir")
+        print("1) Añadir repuesto al almacén")
+        print("2) Ver estado de los almacenes")
+        print("3) Crear nuevo almacén")
+        print("4) Salir")
+        print("5) Volver a mostrar el menú")
 
         opcion = input(f"Elige una opción: ")
 
@@ -742,7 +744,7 @@ def menu_operario(sistema, operario):
         
         # opción no válida: mostrar mensaje de error y volver a mostrar el menú
         else:
-            print("Opción no valida. Por favor, elige una opción del menú")
+            print("Opción no valida. Por favor, pulse 5 para volver a mostrar el menú")
             opcion = input(f"Elige una opción: ")
 
 # demostración del sistema
