@@ -1,7 +1,7 @@
 #impprtaciones necesarias
 from abc import ABCMeta, abstractmethod
 from enum import Enum
-from excepciones import StockInsuficienteError, RepuestoNoEncontradoError
+from excepciones import StockInsuficienteError, RepuestoNoEncontradoError, WrongType
 
 
 class EUbicacion(Enum): #Enum para las ubicaciones de las naves
@@ -17,17 +17,53 @@ class EClaseNave(Enum): #Enum para las clases de las naves estelares
 #clase padre Nave 
 class Nave:
     """
-    Clase base que rrepresneta una nave genérica del sistema.
+    Clase base que representa una nave genérica del sistema.
     Contiene atributos comunes a todas las naves, como el nombre y el catálogo de repuestos necesarios para su mantenimiento.
     """
 
     def __init__(self, nombre, catalogo):
+        if not isinstance(nombre, str): # si el nombre no es una cadena de texto entonces lanza error
+            raise WrongType("El nombre de la nave debe ser un string")
+        
+        if not isinstance(catalogo, list) or not all(isinstance(x, str) for x in catalogo): # si el catálogo no es una lista de objetos string entonces lanza error
+            raise WrongType("El catálogo debe de ser una lista de nombres de repuestos (string)")
+        
         self.nombre = nombre
         self.catalogo = catalogo
 
-    def usar_repuesto(self, nombre):
-        """Comprueba si un repuesto está disponible en el catálogo de la nave."""
+    # setters y getters para controlar el acceso a los atributos y validar los datos
 
+    def set_nombre(self, nombre:str):
+        """Establece el nombre de la nave, controlando que sea un string válido."""
+        if not isinstance(nombre, str):
+            raise WrongType("El nombre de la nave debe ser un string")
+        self.nombre = nombre
+    
+    def set_catalogo(self, catalogo:list[str]):
+        """Establece el catálogo de repuestos necesarios para el mantenimiento de la nave, controlando que sea una lista de strings válida."""
+        if not isinstance(catalogo, list) or not all(isinstance(x, str) for x in catalogo): # si el catálogo no es una lista de objetos string entonces lanza error
+            raise WrongType("El catálogo debe de ser una lista de nombres de repuestos (string)")
+        self.catalogo = catalogo
+    
+    def get_nombre(self):
+        """Devuelve el nombre de la nave."""
+        return self.nombre
+    
+    def get_catalogo(self):
+        """Devuelve el catálogo de repuestos de la nave."""
+        return self.catalogo
+    
+    # métodos de la clase Nave
+
+    def mostrar_catalogo(self):
+        """Muestra el catálogo de repuestos necesarios para el mantenimiento de la nave."""
+        for repuesto in self.catalogo:
+            print(repuesto)
+
+    def usar_repuesto(self, nombre: str):
+        """Comprueba si un repuesto está disponible en el catálogo de la nave."""
+        if not isinstance(nombre, str): # si el nombre no es una cadena de texto entonces lanza error
+            raise WrongType("El nombre de la nave debe ser un string")
         return nombre in self.catalogo
     
     def __str__(self):
@@ -42,8 +78,36 @@ class UnidadCombate:
     """
 
     def __init__(self, id_combate, clave):
+        if not isinstance(id_combate, str): # si el id_combate no es una cadena de texto entonces lanza error
+            raise WrongType("El id_combate de la nave debe ser un string")
+        
+        if not isinstance(clave, int): # si la clave no es un número entero entonces lanza error
+            raise WrongType("La clave de la nave debe ser un número entero")
+        
         self.id_combate = id_combate
         self.clave = clave
+    
+    # setters y getters para controlar el acceso a los atributos y validar los datos
+
+    def set_id_combate(self, id_combate: str):
+        """Establece el ID de combate de la nave, controlando que sea un string válido."""
+        if not isinstance(id_combate, str): # si el id_combate no es una cadena de texto entonces lanza error
+            raise WrongType("El id_combate de la nave debe ser un string")
+        self.id_combate = id_combate
+    
+    def set_clave(self, clave:int):
+        """Establece la clave de la nave, controlando que sea un número entero válido."""
+        if not isinstance(clave, int):
+            raise WrongType("La clave de la nave debe ser un número entero")
+        self.clave = clave
+
+    def get_id_combate(self):
+        """Devuelve el ID de combate de la nave."""
+        return self.id_combate
+    
+    def get_clave(self):
+        """Devuelve la clave de la nave."""
+        return self.clave
 
     def __str__(self):
         return f"ID Combate: {self.id_combate}"
@@ -61,12 +125,56 @@ class EstacionEspacial(Nave, UnidadCombate):
     def __init__(self, nombre, catalogo, id_combate, clave, tripulacion, pasaje, localizacion):
         Nave.__init__(self, nombre, catalogo) #Llamamos al constructor de Nave para inicializar los atributos comunes
         UnidadCombate.__init__(self, id_combate, clave) #Llamamos al constructor de UnidadCombate para inicializar los atributos de combate
-
-        if tripulacion < 0 or pasaje < 0: 
-            raise ValueError("Valores incorrectos")
+        
+        if not isinstance(tripulacion, int): 
+            raise WrongType("La cantidad de tripulantes de la nave debe de ser un número entero")
+        
+        if not isinstance(pasaje, int): 
+            raise WrongType("El pasaje de la nave debe ser un número entero")
+        
+        if not isinstance(localizacion, EUbicacion): 
+            raise WrongType("La localización de la nave debe ser una de las ubicaiones posibles (EUbicacion)")
+        
+        if tripulacion < 0: 
+            raise ValueError("Tripulación debe ser un número mayor que 0")
+        
+        if pasaje < 0:
+            raise ValueError("El pasaje debe de ser un número mayor que 0")
 
         self.tripulacion = tripulacion
         self.pasaje = pasaje
+        self.localizacion = localizacion
+
+    # setters y getters para controlar el acceso a los atributos y validar los datos
+
+    def get_tripulacion(self):
+        """Devuelve la cantidad de tripulantes de la estación espacial."""
+        return self.tripulacion
+    
+    def get_pasaje(self):
+        """Devuelve el pasaje de la estación espacial."""
+        return self.pasaje
+    
+    def get_localizacion(self):
+        """Devuelve la localización de la estación espacial."""
+        return self.localizacion
+    
+    def set_tripulacion(self, tripulacion):
+        """Establece la cantidad de tripulantes de la estación espacial, controlando que sea un número entero válido."""
+        if not isinstance(tripulacion, int): 
+            raise WrongType("La cantidad de tripulantes de la nave debe de ser un número entero")
+        self.tripulacion = tripulacion
+
+    def set_pasaje(self, pasaje):
+        """Establece el pasaje de la estación espacial, controlando que sea un número entero válido."""
+        if not isinstance(pasaje, int): 
+            raise WrongType("El pasaje de la nave debe ser un número entero")
+        self.pasaje = pasaje
+
+    def set_localizacion(self, localizacion):
+        """Establece la localización de la estación espacial, controlando que sea un valor válido del Enum EUbicacion."""
+        if not isinstance(localizacion, EUbicacion): 
+            raise WrongType("La localización de la nave debe ser una de las ubicaiones posibles (EUbicacion)")
         self.localizacion = localizacion
 
     def __str__(self):
@@ -85,11 +193,59 @@ class NaveEstelar(Nave, UnidadCombate):
         Nave.__init__(self, nombre, catalogo)
         UnidadCombate.__init__(self, id_combate, clave)
 
-        if tripulacion < 0 or pasaje < 0:
-            raise ValueError("Valores incorrectos")
+        if not isinstance(tripulacion, int): 
+            raise WrongType("La cantidad de tripulantes de la nave debe de ser un número entero")
+        
+        if not isinstance(pasaje, int): 
+            raise WrongType("El pasaje de la nave debe ser un número entero")
+        
+        if not isinstance(tipo_clase, EClaseNave): 
+            raise WrongType("La clase de la nave debe ser una de las clases posibles (EClaseNave)")
+        
+        if tripulacion < 0: 
+            raise ValueError("Tripulación debe ser un número mayor que 0")
+        
+        if pasaje < 0:
+            raise ValueError("El pasaje debe de ser un número mayor que 0")
 
         self.tripulacion = tripulacion
         self.pasaje = pasaje
+        self.tipo_clase = tipo_clase
+    
+    # setters y getters para controlar el acceso a los atributos y validar los datos
+
+    def get_tripulacion(self):
+        """Devuelve la cantidad de tripulantes de la nave estelar."""
+        return self.tripulacion
+    
+    def get_pasaje(self):
+        """Devuelve el pasaje de la nave estelar."""
+        return self.pasaje
+    
+    def get_tipo_clase(self):
+        """Devuelve el tipo de clase de la nave estelar."""
+        return self.tipo_clase
+    
+    def set_tripulacion(self, tripulacion):
+        """Establece la cantidad de tripulantes de la nave estelar, controlando que sea un número entero válido."""
+        if not isinstance(tripulacion, int): 
+            raise WrongType("La cantidad de tripulantes de la nave debe de ser un número entero")
+        if tripulacion < 0:
+            raise TypeError("La tripulación debe ser un número mayor que 0")
+        self.tripulacion = tripulacion
+
+    def set_pasaje(self, pasaje):
+        """Establece el pasaje de la nave estelar, controlando que sea un número entero válido."""
+        if not isinstance(pasaje, int): 
+            raise WrongType("El pasaje de la nave debe ser un número entero")
+        if pasaje < 0:
+            raise TypeError("El pasaje debe ser un número mayor que 0")
+        self.pasaje = pasaje
+
+    def set_tipo_clase(self, tipo_clase):
+        """Establece el tipo de clase de la nave estelar, controlando que sea un valor válido del Enum EClaseNave."""
+        if not isinstance(tipo_clase, EClaseNave): 
+            raise WrongType("La clase de la nave debe ser una de las clases posibles (EClaseNave)")
         self.tipo_clase = tipo_clase
 
     def __str__(self):
@@ -108,9 +264,26 @@ class CazaEstelar(Nave, UnidadCombate):
         Nave.__init__(self, nombre, catalogo)
         UnidadCombate.__init__(self, id_combate, clave)
 
-        if dotacion < 0:
-            raise ValueError("Dotación icnorrecta")
+        if not isinstance(dotacion, int):
+            raise WrongType("La dotación de la nave debe ser in número entero")
         
+        if dotacion < 0:
+            raise ValueError("La dotación debe ser un número mayor que 0")
+
+        self.dotacion = dotacion
+    
+    # setters y getters para controlar el acceso a los atributos y validar los datos
+
+    def get_dotacion(self):
+        """Devuelve la dotación de la caza estelar."""
+        return self.dotacion
+    
+    def set_dotacion(self, dotacion):
+        """Establece la dotación de la caza estelar, controlando que sea un número entero válido."""
+        if not isinstance(dotacion, int):
+            raise WrongType("La dotación debe ser un número entero")
+        if dotacion < 0:
+            raise TypeError("La dotación debe ser un número mayor que 0")
         self.dotacion = dotacion
 
     def __str__(self):
@@ -125,21 +298,78 @@ class Repuesto:
     """
 
     def __init__(self, nombre, proveedor, cantidad, precio):
-        if cantidad < 0 or precio < 0:
-            raise ValueError("Valores incorrectos ")
+        if not isinstance(nombre, str):
+            raise WrongType("El nombre del repuesto debe ser un string")
+        
+        if not isinstance(proveedor, str):
+            raise WrongType("El nombre del proveedor debe ser un string")
+        
+        if not isinstance(cantidad, int):
+            raise WrongType("La cantidad de repuestos que hay debe ser un número entero")
+        
+        if not isinstance(precio, (int, float)):
+            raise WrongType("El precio del repuesto debe ser un número")
+        
+        if cantidad < 0:
+            raise TypeError("La cantidad de repuesto debe ser un número mayor que 0")
+        
+        if precio < 0:
+            raise TypeError("El precio del repuesto debe ser un número mayor que 0")
+
         self.nombre = nombre
         self.proveedor = proveedor
         self.__cantidad = cantidad #atributo provado para proteger el stock del repuesto y controlar su acceso a través de métodos específicos
         self.precio = precio
 
-    def obtener_cantidad(self):
-        """Devuelve la cantidad siponible del repuesto"""
+    # setters y getters para controlar el acceso a los atributos y validar los datos
 
+    def obtener_cantidad(self):
+        """Devuelve la cantidad disponible del repuesto"""
         return self.__cantidad
     
+    def get_nombre(self):
+        """Devuelve el nombre del repuesto."""
+        return self.nombre
+    
+    def get_proveedor(self):
+        """Devuelve el nombre del proveedor."""
+        return self.proveedor
+    
+    def get_precio(self):
+        """Devuelve el precio del repuesto."""
+        return self.precio
+    
+    def set_cantidad(self, cantidad):
+        """Establece la cantidad disponible del repuesto, controlando que sea un número entero válido."""
+        if not isinstance(cantidad, int):
+            raise WrongType("La cantidad de repuestos que hay debe ser un número entero")
+        if cantidad < 0:
+            raise TypeError("La cantidad de repuesto debe ser un número mayor que 0")
+        self.__cantidad = cantidad
+    
+    def set_nombre(self, nombre):
+        """Establece el nombre del repuesto, controlando que sea un string válido."""
+        if not isinstance(nombre, str):
+            raise WrongType("El nombre del repuesto debe ser un string")
+        self.nombre = nombre
+
+    def set_proveedor(self, proveedor):
+        """Establece el nombre del proveedor del repuesto, controlando que sea un string válido."""
+        if not isinstance(proveedor, str):
+            raise WrongType("El nombre del proveedor debe ser un string")
+        self.proveedor = proveedor
+
+    def set_precio(self, precio):
+        """Establece el precio del repuesto, controlando que sea un número float válido."""
+        if not isinstance(precio, float):
+            raise WrongType("El precio del repuesto debe ser un float")
+        if precio < 0:
+            raise TypeError("El precio del repuesto debe ser un número mayor que 0")
+        self.precio = precio
+    
+    # métodos de la clase Repuesto
     def reducir_stock(self, cantidad):
         """Reduce el stock del repuesto al solicitarlo, controlando que la cantidad solicitada no supere el stock disponible y manejando errores en caso contrario."""
-
         if cantidad <= 0:
             raise ValueError("Cantidad incorrecta")
         if cantidad > self.__cantidad:
@@ -159,10 +389,38 @@ class Almacen:
     """
 
     def __init__(self, nombre, localizacion):
+        if not isinstance(nombre, str):
+            raise WrongType("El nombre del almacén debe ser un string")
+        if not isinstance(localizacion, str):
+            raise WrongType("La localización debe ser un string")
+        
         self.nombre = nombre
         self.localizacion = localizacion
         self.catalogo = []
+    
+    # setters y getters para controlar el acceso a los atributos y validar los datos
 
+    def set_nombre(self, nombre):
+        """Establece el nombre del almacén, controlando que sea un string válido."""
+        if not isinstance(nombre, str):
+            raise WrongType("El nombre del almacén debe ser un string")
+        self.nombre = nombre
+    
+    def set_localizacion(self, localizacion):
+        """Establece la localización del almacén, controlando que sea un string válido."""
+        if not isinstance(localizacion, str):
+            raise WrongType("La localización debe ser un string")
+        self.localizacion = localizacion
+
+    def get_nombre(self):
+        """Devuelve el nombre del almacén."""
+        return self.nombre
+    
+    def get_localizacion(self):
+        """Devuelve la localización del almacén."""
+        return self.localizacion
+
+    # métodos de la clase Almacen
     def anadir_repuesto(self, repuesto):
         """Añade un repuesto al ctálogo del almacén."""
 
@@ -211,7 +469,7 @@ class Comandante(Usuario):
     """
 
     def usar_sistema(self):
-        print("Solicitando repuesto")
+        print("Solicitando repuesto...")
     
     def solicitar_repuesto(self, sistema, nombre, cantidad):
         """Solicita un repuesto al sistema."""
@@ -225,11 +483,10 @@ class Operario(Usuario):
     """Representa a un operario del imperio que puede gestionar los almacenes y añadir repuestos al sistema."""
 
     def usar_sistema(self):
-        print("Geestionando almacén")
+        print("Gestionando almacén")
 
     def anadir_repuesto(self, almacen, repuesto):
         """Añade un repuesto a un almacén."""
-
         almacen.anadir_repuesto(repuesto)
 
     def __str__(self):
@@ -277,6 +534,14 @@ class MiImperio:
         return f"MiImperio(Almacenes:{len(self.almacenes)}, Naves:{len(self.naves)})"
 
 #Menú para interfaz de usuario
+def pedir_entero(mensaje):
+    """Función auxiliar para pedir un número entero al usuario, controlando errores de entrada."""
+    while True:
+        try:
+            valor = int(input(mensaje))
+            return valor
+        except ValueError:
+            print("Entrada no válida. Por favor, ingrese un número entero.")
 def menu():
     """
     Implementa una interfaz de usuario por consola.
@@ -289,10 +554,12 @@ def menu():
     """
 
     sistema = MiImperio()
+    print(f"\nBienvenido al sistema de gestión de repuestos del Imperio Galáctico")
     nombre_usuario = input(f"Introduzca su nombre: ")
     comandante = Comandante(nombre_usuario)
     operario = Operario("Administrador")
-
+    
+    # Almacén inicial para la demostración, se puede eliminar o modificar según se desee
     a1 = Almacen("Almacen principal", "Endor")
     sistema.agregar_almacen(a1)
 
@@ -310,14 +577,22 @@ def menu():
 
         if opcion == "1":
             try:
+                print("\n Almacenes disponibles:")
+                for i, almacen in enumerate(sistema.almacenes):
+                    print(f"{i+1}) {almacen.get_nombre()} - Ubicación: {almacen.get_localizacion()}")
+
+                idx = pedir_entero(f"Selecciona el número del almacén al que deseas añadir el repuesto: ") - 1
+                almacen_seleccionado = sistema.almacenes[idx]
+
                 nombre = input("Nombre del repuesto: ")
                 proveedor = input(f"Proveedor: ")
-                cantidad = int(input(f"Cantidad: "))
+                cantidad = pedir_entero(f"Cantidad: ")  
                 precio = float(input(f"Precio: "))
 
                 rep = Repuesto(nombre, proveedor, cantidad, precio)
-                operario.anadir_repuesto(a1, rep)
-                print(f"Repuesto '{nombre}' añadido al almacén '{a1.nombre}' correctamente")
+                operario.anadir_repuesto(almacen_seleccionado, rep)
+
+                print(f"Repuesto '{nombre}' añadido al almacén '{almacen_seleccionado.get_nombre()}' correctamente")
             
             except Exception as e:
                 print(f"Error: {e}")
@@ -326,11 +601,12 @@ def menu():
             try:
                 print(f"\nRepuestos disponibles:")
                 for almacen in sistema.almacenes:
+                    print(f"\nAlmacén: {almacen.get_nombre()}, Ubicación: {almacen.get_localizacion()}")
                     for rep in almacen.catalogo:
-                        print(f"- {rep.nombre}")
+                        print(f"- {rep.get_nombre()}")
 
                 nombre = input("Nombre del repuesto: ")
-                cantidad = int(input(f"Cantidad: "))
+                cantidad = pedir_entero(f"Cantidad: ")
 
                 rep = comandante.solicitar_repuesto(sistema, nombre, cantidad)
                 print(f"Repuesto '{nombre}' solicitado correctamente. Stock restante: {rep.obtener_cantidad()}")
@@ -374,10 +650,10 @@ def demo():
     operario = Operario("Vader")
 
     #creación de respuestos
-    r1 = Repuesto("Motor", "Proveedor1", 20, 700)
-    r2 = Repuesto("Ala", "Proveedor2", 5, 300)
-    r3 = Repuesto("Escudo", "Proveedor3", 10, 600)
-    r4 = Repuesto("Turbina", "Proveedor4", 2, 2000)
+    r1 = Repuesto("Motor", "Proveedor1", 20, 700.0)
+    r2 = Repuesto("Ala", "Proveedor2", 5, 300.5)
+    r3 = Repuesto("Escudo", "Proveedor3", 10, 600.0)
+    r4 = Repuesto("Turbina", "Proveedor4", 2, 2000.3)
 
     print(f"\nRepuestos creados:")
     for rep in [r1, r2, r3, r4]:
