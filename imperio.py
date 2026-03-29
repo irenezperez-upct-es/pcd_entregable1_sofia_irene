@@ -664,6 +664,7 @@ def menu_comandante(sistema, comandante):
         # opción 4: Salir del sistema
         elif opcion == "4":
             print(f"¡Hasta pronto, Comandante {comandante.nombre}!")
+            break
 
         # opción no válida: mostrar mensaje de error y volver a mostrar el menú
         else:
