@@ -542,39 +542,134 @@ def pedir_entero(mensaje):
             return valor
         except ValueError:
             print("Entrada no válida. Por favor, ingrese un número entero.")
+
 def menu():
     """
-    Implementa una interfaz de usuario por consola.
-    Permite interactuar con el sistema a través de un menú que ofrece las siguientes opciones:
-    1) Añadir repuesto al almacén (Operario)
-    2) Solicitar repuesto (Comandante)
-    3) Ver estado de los almacenes
-    4) Crear nuevo almacén
-    5) Salir
-    """
+    Interfaz principal del sistema
+    Permite elegir el tipo de usuario (Comandante u Operario) y redirige
+    al menú correspondiente según los permisos de cada rol (Comandantes pueden solicitar repuestos y 
+    consultar el estado de los almacenes, mientras que Operarios pueden añadir repuestos, crear nuevos almacenes y consultar el estado de los almacenes).
 
+    """
     sistema = MiImperio()
-    print(f"\nBienvenido al sistema de gestión de repuestos del Imperio Galáctico")
-    nombre_usuario = input(f"Introduzca su nombre: ")
-    comandante = Comandante(nombre_usuario)
-    operario = Operario("Administrador")
-    
+
     # Almacén inicial para la demostración, se puede eliminar o modificar según se desee
     a1 = Almacen("Almacen principal", "Endor")
     sistema.agregar_almacen(a1)
 
-    while True: #bucle para mostrar el menú de forma continua hasta que el usuario decida salir
-        print(f"\n")
-        print(f"\n---Menú principal---")
-        print()
-        print(f"1) Añadir repuesto al almacén (Operario)")
-        print(f"2) Solicitar repuesto (Comandante)")
-        print(f"3) Ver estado de los almacenes")
-        print(f"4) Crear nuevo almacén")
-        print(f"5) Salir")
-        
-        opcion = input(f"Bienvenido {comandante.nombre}, elige una opción: ")
+    
+    print(f"\nBienvenido al sistema de gestión de repuestos del Imperio Galáctico")
 
+    codigo = input("Introduce el código imperial para ingresar al sistema: ")
+
+    # Comandante
+    if codigo.startswith("CMD-"):
+        print("Código de comandante reconocido.")
+        nombre = input("Introduzca el nombre del comandante: ")
+        comandante = Comandante(nombre)
+        menu_comandante(sistema, comandante)
+    
+    # Operario
+    elif codigo.startswith("OPR-"):
+        print("Código de operario reconocido.")
+        nombre = input("Introduzca el nombre del operario: ")
+        operario = Operario(nombre)
+        menu_operario(sistema, operario)
+    
+    # Código no reconocido
+    else:
+        print("Código no reconocido. Acceso denegado.")
+        return
+
+    
+        
+def menu_comandante(sistema, comandante):   
+    """Menú específico para comandantes, encargados de consultar y adquirir repuestos
+       Los comandantes solo pueden:
+       1) Consultar repuestos disponibles en los almacenes
+       2) Solicitar repuestos (si hay stock suficiente)
+       3) Ver el estado de los almacenes (qué repuestos hay y en qué cantidad)
+       4) Salir del sistema
+       
+       Parámetros:
+       - sistema (MiImperio): instancia de MiImperio que representa el sistema principal del imperio que getsiona almacenes y naves
+       - comandante (Comandante): instancia de Comandante que representa al usuario comandante que está utilizando el sistema que es el que tiene permisos de solicitud de repuestos
+       """
+
+    while True: # bucle para mostrar el menú de forma continua hasta que el usuario decida salir
+        print("\n")
+        print("\n---MENÚ DEL COMANDANTE---")
+        print()
+        print("1) Ver repuestos disponibles en los almacenes")
+        print("2) Solicitar repuesto")
+        print("3) Ver estado de los almacenes")
+        print("4) Salir")
+
+
+        opcion = input(f"Elige una opción: ")
+
+        # Opción 1: Ver repuestos disponibles en los almacenes
+        if opcion == "1":
+            print("\nRepuestos disponibles:")
+            for almacen in sistema.almacenes:
+                print(f"\nAlmacén: {almacen.get_nombre()}, Ubicación: {almacen.get_localizacion()}")
+                for rep in almacen.catalogo:
+                    print(f"- {rep.get_nombre()}")
+        
+        # opción 2: Solicitar repuesto
+        elif opcion == "2":
+            try:
+                nombre = input("Nombre del repuesto: ")
+                cantidad = pedir_entero(f"Cantidad: ")
+
+                rep = comandante.solicitar_repuesto(sistema, nombre, cantidad)
+                print(f"Repuesto '{nombre}' solicitado correctamente. Stock restante: {rep.obtener_cantidad()}")
+            
+            except Exception as e:
+                print(f"Error: {e}")
+        
+        # opción 3: Ver estado de los almacenes
+        elif opcion == "3":
+            for almacen in sistema.almacenes:
+                print(f"\nAlmacén: {almacen.nombre}, Ubicación: {almacen.localizacion}")
+                for repuesto in almacen.catalogo:
+                    print(f"- {repuesto}")
+
+        # opción 4: Salir del sistema
+        elif opcion == "4":
+            print(f"¡Hasta pronto, Comandante {comandante.nombre}!")
+
+        # opción no válida: mostrar mensaje de error y volver a mostrar el menú
+        else:
+            print("Opción no valida. Por favor, elige una opción del menú")
+            opcion = input(f"Elige una opción: ")
+
+
+def menu_operario(sistema, operario):
+    """ 
+    Menú exclusivo para Operarios
+    Los operarios pueden:
+    1) Añadir repuestos al almacén
+    2) Ver el estado de los almacenes (qué repuestos hay y en qué cantidad)
+    3) Crear nuevo almacén
+    4) Salir del sistema
+
+    Parámetros:
+    - sistema (MiImperio): instancia de MiImperio que representa el sistema principal del imperio que getsiona almacenes y naves
+    - operario (Operario): instancia de Operario que representa al usuario operario que está utilizando el sistema
+    """
+    while True: # bucle para mostrar el menú de forma continua hasta que el usuario decida salir
+        print(f"\n")
+        print(f"\n---MENÚ DEL OPERARIO---")
+        print()
+        print(f"1) Añadir repuesto al almacén")
+        print(f"2) Ver estado de los almacenes")
+        print(f"3) Crear nuevo almacén")
+        print(f"4) Salir")
+
+        opcion = input(f"Elige una opción: ")
+
+        # opción 1: Añadir repuesto al almacén
         if opcion == "1":
             try:
                 print("\n Almacenes disponibles:")
@@ -586,63 +681,53 @@ def menu():
 
                 nombre = input("Nombre del repuesto: ")
                 proveedor = input(f"Proveedor: ")
-                cantidad = pedir_entero(f"Cantidad: ")  
+                cantidad = pedir_entero(f"Cantidad: ")
                 precio = float(input(f"Precio: "))
 
                 rep = Repuesto(nombre, proveedor, cantidad, precio)
                 operario.anadir_repuesto(almacen_seleccionado, rep)
 
                 print(f"Repuesto '{nombre}' añadido al almacén '{almacen_seleccionado.get_nombre()}' correctamente")
-            
             except Exception as e:
                 print(f"Error: {e}")
 
+        # opción 2: Ver estado de los almacenes
         elif opcion == "2":
-            try:
-                print(f"\nRepuestos disponibles:")
-                for almacen in sistema.almacenes:
-                    print(f"\nAlmacén: {almacen.get_nombre()}, Ubicación: {almacen.get_localizacion()}")
-                    for rep in almacen.catalogo:
-                        print(f"- {rep.get_nombre()}")
-
-                nombre = input("Nombre del repuesto: ")
-                cantidad = pedir_entero(f"Cantidad: ")
-
-                rep = comandante.solicitar_repuesto(sistema, nombre, cantidad)
-                print(f"Repuesto '{nombre}' solicitado correctamente. Stock restante: {rep.obtener_cantidad()}")
-            
-            except Exception as e:
-                print(f"Error: {e}")
-
-        elif opcion == "3":
             for almacen in sistema.almacenes:
-                print(f"\nAlmacén: {almacen.nombre}, Ubicación: {almacen.localizacion}")
+                print(f"\nAlmacén: {almacen.get_nombre()}, Ubicación: {almacen.get_localizacion()}")
                 for repuesto in almacen.catalogo:
                     print(f"- {repuesto}")
         
-        elif opcion == "4":
+        # opción 3: Crear nuevo almacén
+        elif opcion == "3":
             try:
-                nombre = input("Nombre del almacén: ")
+                nombre = input("Nombre del nuevo almacén: ")
                 localizacion = input(f"Ubicación: ")
                 nuevo_almacen = Almacen(nombre, localizacion)
 
                 sistema.agregar_almacen(nuevo_almacen)
                 print(f"Almacén '{nombre}' creado correctamente")
-            
             except Exception as e:
                 print(f"Error: {e}")
-
-        elif opcion == "5":
-            print(f"Saliendo del sistema. Hasta pronto {comandante.nombre}!")
+        
+        # opción 4: Salir del sistema
+        elif opcion == "4":
+            print(f"¡Hasta pronto, Operario {operario.nombre}!")
             break
+        
+        # opción no válida: mostrar mensaje de error y volver a mostrar el menú
         else:
-            print(f"Opción no valida. Por favor, elige una opción del menú")
+            print("Opción no valida. Por favor, elige una opción del menú")
+            opcion = input(f"Elige una opción: ")
 
-#demostración
+# demostración del sistema
 def demo():
     """
     Función de demostración que muestra el funcionamiento del sistema a través de una serie de acciones predefinidas.
     Crea objetos de ejemplo y simula distintas operaciones, incluyendo casos correctos y manejo de errrores.
+    Esta función crea usuarios, repuestos, almacenes y naves, y ejecuta
+    operaciones típicas como solicitar repuestos, manejar errores y mostrar estados
+    No requiere interacción del usuario
     """
 
     #creación de usuarios
@@ -682,6 +767,7 @@ def demo():
     nave2= NaveEstelar("Pleiades", ["Motor"], "Id2", 2222, 20, 5, EClaseNave.EJECUTOR)
     nave3 = CazaEstelar("Athena", ["Motor"], "Id3", 3333, 1)
 
+    # creación del sistema
     sistema = MiImperio()
     sistema.agregar_almacen(a1)
     sistema.agregar_almacen(a2)
@@ -732,7 +818,7 @@ def demo():
 
     #Mostrar estado de los almacenes
     for almacen in sistema.almacenes:
-        print(f"\nAlmacén: {almacen.nombre}, Ubicación: {almacen.localizacion}")
+        print(f"\nAlmacén: {almacen.get_nombre()}, Ubicación: {almacen.get_localizacion()}")
         for repuesto in almacen.catalogo:
             print(f"- {repuesto}")
 
